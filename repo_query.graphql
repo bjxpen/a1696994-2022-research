@@ -1,0 +1,85 @@
+query ($queryStr: String!, $maxResults: Int, $lastCursorId: String = null) {
+  search(
+    type: REPOSITORY
+    query: $queryStr
+    first: $maxResults
+    after: $lastCursorId
+  ) {
+    repositoryCount
+    pageInfo {
+	  #startCursor
+	  #hasPrevPage
+      hasNextPage
+      lastCursorId: endCursor
+    }
+
+    nodes {
+      ... on Repository {
+        
+        id: databaseId
+        nameWithOwner
+        stars: stargazerCount
+        isFork
+		kilobytes: diskUsage
+        createdAt
+        # pushedAt
+        updatedAt
+		description
+        ...closedIssues
+        ...commits
+        ...topics
+
+		# Too long which leads to timeout on bothends
+		# Cannot stream
+		
+        # readmeCaps: object(expression: "HEAD:README.md") {
+          # null if not found
+          # ... on Blob {
+            # text
+          # }
+        # }
+        # readmeLowercase: object(expression: "HEAD:readme.md") {
+          # null if not found
+          # ... on Blob {
+            # text
+          # }
+        # }
+      }
+    }
+  }
+
+  rateLimit {
+	cost
+    remaining
+	resetAt
+  }
+}
+
+fragment commits on Repository {
+  defaultBranchRef {
+    target {
+      ... on Commit {
+        history(first: 0) {
+          totalCount
+        }
+      }
+    }
+  }
+}
+
+fragment closedIssues on Repository {
+  closedIssues: issues(first: 0, states: [CLOSED]) {
+    totalCount
+  }
+}
+
+fragment topics on Repository {
+  topics: repositoryTopics(first: 100) {
+    nodes {
+      topic {
+        name
+      }
+    }
+    totalCount
+  }
+}

@@ -1,0 +1,16 @@
+httpx
+anyio
+python-dateutil
+aiolimiter
+astunparse
+natsort
+charset-normalizer
+numpy
+matplotlib
+seaborn
+ratelimit
+pygit2
+pygount
+jc
+pandas
+scipy
